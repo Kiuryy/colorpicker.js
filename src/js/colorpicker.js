@@ -1,5 +1,5 @@
 /**
- * Colorpicker v1.0.1
+ * Colorpicker.js
  *
  * Philipp König
  * https://blockbyte.de
@@ -7,6 +7,11 @@
 window.Colorpicker = (() => {
     "use strict";
 
+    /**
+     * Color class -> Provides information about the current color of the picker
+     *
+     * @constructor
+     */
     function Color() {
         this.r = 0;
         this.g = 0;
@@ -16,55 +21,41 @@ window.Colorpicker = (() => {
         this.saturation = 0;
         this.value = 0;
 
-        let isValidRGBValue = (value) => {
-            return typeof(value) === 'number' && isNaN(value) === false && value >= 0 && value <= 255;
+        /**
+         * Returns whether the given value is an numeric value or not
+         *
+         * @param {mixed} value
+         * @returns {boolean}
+         */
+        let isNumeric = (value) => {
+            return typeof value === 'number' && isNaN(value) === false;
         };
 
+        /**
+         * Sets the color to the given rgba values
+         *
+         * @param {int} red
+         * @param {int} green
+         * @param {int} blue
+         * @param {float} alpha
+         */
         let setRGBA = (red, green, blue, alpha) => {
-            if (isValidRGBValue(red) && isValidRGBValue(green) && isValidRGBValue(blue)) {
-                this.r = red | 0;
-                this.g = green | 0;
-                this.b = blue | 0;
+            if (isNumeric(red) && isNumeric(green) && isNumeric(blue)) {
+                this.r = Math.max(0, Math.min(255, red | 0));
+                this.g = Math.max(0, Math.min(255, green | 0));
+                this.b = Math.max(0, Math.min(255, blue | 0));
 
-                if (isValidRGBValue(alpha) === true) {
-                    this.a = alpha;
+                if (isNumeric(alpha) === true) {
+                    this.a = Math.max(0, Math.min(1, alpha));
                 }
             }
         };
 
-        this.setByName = (name, value) => {
-            if ((name === 'r' || name === 'g' || name === 'b' || name === 'a') && isValidRGBValue(value)) {
-                this[name] = value;
-                RGBtoHSV();
-            }
-        };
-
-        this.setHSV = (hue, saturation, value) => {
-            this.hue = hue;
-            this.saturation = saturation;
-            this.value = value;
-            HSVtoRGB();
-        };
-
-        this.setHue = (value) => {
-            if (typeof(value) !== 'number' || isNaN(value) === true ||
-                value < 0 || value > 359) {
-                return;
-            }
-            this.hue = value;
-            HSVtoRGB();
-        };
-
-        this.setFromRaw = (value) => {
-            value = value.trim();
-
-            if (/(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)/i.test(value)) {
-                setHexFromRaw(value);
-            } else if (/^rgba?\([^)]+\)$/i.test(value)) {
-                setRGBAFromRaw(value);
-            }
-        };
-
+        /**
+         * Sets the color from the given raw rgba string
+         *
+         * @param {string} value
+         */
         let setRGBAFromRaw = (value) => {
             let digits = value.match(/(\d*\.\d*|\d+)/g);
 
@@ -80,6 +71,11 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Sets the color from the given raw hex string
+         *
+         * @param {string} value
+         */
         let setHexFromRaw = (value) => {
             let valid = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)/i.test(value);
 
@@ -101,6 +97,9 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Sets the rgb values from the hsv values
+         */
         let HSVtoRGB = () => {
             let sat = this.saturation / 100;
             let value = this.value / 100;
@@ -129,6 +128,9 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Sets the hsv values from the rgb values
+         */
         let RGBtoHSV = () => {
             let red = this.r / 255;
             let green = this.g / 255;
@@ -163,6 +165,80 @@ window.Colorpicker = (() => {
             this.value = (cmax * 100) | 0;
         };
 
+        /**
+         * Sets the color from the given raw string
+         *
+         * @param {string} value
+         */
+        this.setFromRaw = (value) => {
+            value = value.trim();
+
+            if (value === "transparent") {
+                this.r = 0;
+                this.g = 0;
+                this.b = 0;
+                this.a = 0;
+                RGBtoHSV();
+            } else if (/(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)/i.test(value)) {
+                setHexFromRaw(value);
+            } else if (/^rgba?\([^)]+\)$/i.test(value)) {
+                setRGBAFromRaw(value);
+            }
+        };
+
+        /**
+         * Sets the given rgb value to the given value
+         *
+         * @param {string} name 'r', 'g', 'b' or 'a'
+         * @param {int|float} value
+         */
+        this.setByName = (name, value) => {
+            if ((name === 'r' || name === 'g' || name === 'b' || name === 'a') && isNumeric(value)) {
+                let maxLimit = 1;
+
+                if (name !== "a") {
+                    value = value | 0;
+                    maxLimit = 255;
+                }
+
+                this[name] = Math.max(0, Math.min(maxLimit, value));
+                RGBtoHSV();
+            }
+        };
+
+        /**
+         * Sets the color to the given hsv values
+         *
+         * @param {int} hue
+         * @param {int} saturation
+         * @param {int} value
+         */
+        this.setHSV = (hue, saturation, value) => {
+            if (isNumeric(hue) && isNumeric(saturation) && isNumeric(value)) {
+                this.hue = Math.max(0, Math.min(360, hue));
+                this.saturation = Math.max(0, Math.min(100, saturation));
+                this.value = Math.max(0, Math.min(100, value));
+                HSVtoRGB();
+            }
+        };
+
+        /**
+         * Sets the hue value for the color
+         *
+         * @param {int} value
+         */
+        this.setHue = (value) => {
+            if (isNumeric(value)) {
+                this.hue = Math.max(0, Math.min(360, value));
+                HSVtoRGB();
+            }
+        };
+
+        /**
+         * Returns the hex string of the color
+         *
+         * @returns {string} e.g. '#ffaa00'
+         */
         this.getHex = () => {
             let r = this.r.toString(16);
             let g = this.g.toString(16);
@@ -180,8 +256,13 @@ window.Colorpicker = (() => {
             return value.toLowerCase();
         };
 
+        /**
+         * Returns the color string
+         *
+         * @returns {string} e.g. '#ffaa00' or 'rgba(255,255,255,0.5)'
+         */
         this.getColor = () => {
-            if (this.a | 0 === 1) {
+            if (this.a | 0 === 1) { // no alpha channel -> return as hex string
                 return this.getHex();
             }
 
@@ -198,7 +279,15 @@ window.Colorpicker = (() => {
         };
     }
 
-    return function (field, opts) {
+
+    /**
+     * Picker class -> Adds a colorpicker for the given field with the given options
+     *
+     * @param {Element} field
+     * @param {object} opts
+     * @constructor
+     */
+    function Picker(field, opts) {
         opts = opts || {};
         let wrapper = null;
         let preview = null;
@@ -208,9 +297,9 @@ window.Colorpicker = (() => {
         this.color = new Color();
 
         /**
-         * Initialize
+         * Initialize the picker object
          */
-        let run = () => {
+        let init = () => {
             initPreview();
             initPickingArea();
             initHueSlider();
@@ -247,7 +336,13 @@ window.Colorpicker = (() => {
             updateUI();
         };
 
-        let setMouseTracking = (elm, callback) => {
+        /**
+         * Adds the mousedown/mouseup listener for the given element
+         *
+         * @param {Element} elm
+         * @param {function} callback
+         */
+        let addMouseListener = (elm, callback) => {
             elm.addEventListener('mousedown', (e) => {
                 callback(e);
                 document.addEventListener('mousemove', callback);
@@ -258,6 +353,9 @@ window.Colorpicker = (() => {
             });
         };
 
+        /**
+         * Initialises the picker html and binds the general eventhandlers
+         */
         let initPreview = () => {
             wrapper = document.createElement('div');
             wrapper.className = 'color-picker';
@@ -288,6 +386,9 @@ window.Colorpicker = (() => {
             });
         };
 
+        /**
+         * Initialises the picking area
+         */
         let initPickingArea = () => {
             let area = document.createElement('div');
             let picker = document.createElement('div');
@@ -297,12 +398,43 @@ window.Colorpicker = (() => {
 
             this.pickingArea = area;
             this.colorPicker = picker;
-            setMouseTracking(area, updateColor);
+            addMouseListener(area, (e) => {
+                let rect = this.pickingArea.getBoundingClientRect();
+
+                let offset = 5;
+                let size = this.pickingArea.clientWidth;
+                let pos = [e.pageX - rect.left, e.pageY - rect.top];
+
+                pos.forEach((v, k) => {
+                    if (v > size) {
+                        v = size;
+                    }
+                    if (v < 0) {
+                        v = 0;
+                    }
+                    pos[k] = v;
+                });
+
+                let saturation = pos[0] * 100 / size | 0;
+                let value = 100 - (pos[1] * 100 / size) | 0;
+
+                this.color.setHSV(this.color.hue, saturation, value);
+
+                this.colorPicker.style.left = pos[0] - offset + 'px';
+                this.colorPicker.style.top = pos[1] - offset + 'px';
+
+                updateAlphaGradient();
+                updatePreview();
+                notifyAll();
+            });
 
             area.appendChild(picker);
             wrapper.appendChild(area);
         };
 
+        /**
+         * Initialises the hue slider
+         */
         let initHueSlider = () => {
             let area = document.createElement('div');
             let picker = document.createElement('div');
@@ -312,12 +444,28 @@ window.Colorpicker = (() => {
 
             this.hueArea = area;
             this.huePicker = picker;
-            setMouseTracking(area, updateHueSlider);
+            addMouseListener(area, (e) => {
+                let rect = this.hueArea.getBoundingClientRect();
+                let x = Math.max(0, e.pageX - rect.left);
+                let width = this.hueArea.clientWidth;
+
+                if (x > width) {
+                    x = width;
+                }
+
+                this.huePicker.style.left = Math.max(x - 3, -2) + 'px';
+                this.color.setHue(((359 * x) / width) | 0);
+
+                updateUI();
+            });
 
             area.appendChild(picker);
             wrapper.appendChild(area);
         };
 
+        /**
+         * Initialises the alpha slider
+         */
         let initAlphaSlider = () => {
             let area = document.createElement('div');
             let mask = document.createElement('div');
@@ -333,20 +481,44 @@ window.Colorpicker = (() => {
                 picker: picker
             };
 
-            setMouseTracking(area, updateAlphaSlider);
+            addMouseListener(area, (e) => {
+                let rect = alpha.area.getBoundingClientRect();
+                let x = e.pageX - rect.left;
+                let width = alpha.area.clientWidth;
+
+                if (x < 0) {
+                    x = 0;
+                }
+                if (x > width) {
+                    x = width;
+                }
+
+                this.color.setByName("a", +(x / width).toFixed(2));
+
+                alpha.picker.style.left = Math.max(x - 3, -2) + 'px';
+                updatePreview();
+
+                notifyAll();
+            });
 
             area.appendChild(mask);
             mask.appendChild(picker);
             wrapper.appendChild(area);
         };
 
-        let addInputField = (title, func) => {
+        /**
+         * Initialises an input field of the given type
+         *
+         * @param {string} type
+         * @param {function} func
+         */
+        let addInputField = (type, func) => {
             let elm = document.createElement('div');
             let input = document.createElement('input');
             let info = document.createElement('span');
 
-            elm.className = 'input-' + title;
-            info.textContent = title;
+            elm.className = 'input-' + type;
+            info.textContent = type;
             input.setAttribute('type', 'text');
 
             elm.appendChild(info);
@@ -355,76 +527,14 @@ window.Colorpicker = (() => {
 
             input.addEventListener('change', func);
 
-            subscribers[title] = (value) => {
+            subscribers[type] = (value) => {
                 input.value = value;
             };
         };
 
-        let updateColor = (e) => {
-            let rect = this.pickingArea.getBoundingClientRect();
-
-            let offset = 5;
-            let size = this.pickingArea.clientWidth;
-            let pos = [e.pageX - rect.left, e.pageY - rect.top];
-
-            pos.forEach((v, k) => {
-                if (v > size) {
-                    v = size;
-                }
-                if (v < 0) {
-                    v = 0;
-                }
-                pos[k] = v;
-            });
-
-            let saturation = pos[0] * 100 / size | 0;
-            let value = 100 - (pos[1] * 100 / size) | 0;
-
-            this.color.setHSV(this.color.hue, saturation, value);
-
-            this.colorPicker.style.left = pos[0] - offset + 'px';
-            this.colorPicker.style.top = pos[1] - offset + 'px';
-
-            updateAlphaGradient();
-            updatePreview();
-            notifyAll();
-        };
-
-        let updateHueSlider = (e) => {
-            let rect = this.hueArea.getBoundingClientRect();
-            let x = Math.max(0, e.pageX - rect.left);
-            let width = this.hueArea.clientWidth;
-
-            if (x > width) {
-                x = width;
-            }
-
-            updateSliderPosition(this.huePicker, x);
-            this.color.setHue(((359 * x) / width) | 0);
-
-            updateUI();
-        };
-
-        let updateAlphaSlider = (e) => {
-            let rect = alpha.area.getBoundingClientRect();
-            let x = e.pageX - rect.left;
-            let width = alpha.area.clientWidth;
-
-            if (x < 0) {
-                x = 0;
-            }
-            if (x > width) {
-                x = width;
-            }
-
-            this.color.a = (x / width).toFixed(2);
-
-            updateSliderPosition(alpha.picker, x);
-            updatePreview();
-
-            notifyAll();
-        };
-
+        /**
+         * Updates the positions of the ui elements
+         */
         let updateUI = () => {
             notifyAll();
 
@@ -436,6 +546,9 @@ window.Colorpicker = (() => {
             updatePreview();
         };
 
+        /**
+         * Updated the position of the picker based on the currently selected color
+         */
         let updatePickerPosition = () => {
             let size = this.pickingArea.clientWidth;
             let value = this.color.value;
@@ -448,11 +561,9 @@ window.Colorpicker = (() => {
             this.colorPicker.style.top = y - offset + 'px';
         };
 
-        let updateSliderPosition = (elm, pos) => {
-
-            elm.style.left = Math.max(pos - 3, -2) + 'px';
-        };
-
+        /**
+         * Updates the hue slider thumb position
+         */
         let updateHuePicker = () => {
             let size = this.hueArea.clientWidth;
             let offset = 1;
@@ -460,6 +571,9 @@ window.Colorpicker = (() => {
             this.huePicker.style.left = pos - offset + 'px';
         };
 
+        /**
+         * Updates the alpha slider thumb position
+         */
         let updateAlphaPicker = () => {
             if (alpha) {
                 let size = alpha.area.clientWidth;
@@ -469,24 +583,38 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Updates the background color of the picking area
+         */
         let updatePickerBackground = () => {
             let nc = new Color();
             nc.setHSV(this.color.hue, 100, 100);
             this.pickingArea.style.backgroundColor = nc.getHex();
         };
 
+        /**
+         * Updates the background color of the alpha slider
+         */
         let updateAlphaGradient = () => {
             if (alpha) {
                 alpha.mask.style.background = "linear-gradient(to right, transparent 0%," + this.color.getHex() + " 100%)";
             }
         };
 
+        /**
+         * Updates the color of the preview
+         */
         let updatePreview = () => {
             field.value = this.color.getColor();
             preview.style.backgroundColor = this.color.getColor();
             triggerEvent("change");
         };
 
+        /**
+         * Triggers an event of the given type
+         *
+         * @param {string} type
+         */
         let triggerEvent = (type) => {
             if (typeof callbacks[type] !== "undefined") {
                 callbacks[type].forEach((func) => {
@@ -499,6 +627,9 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Sends all notifications to the subscribers
+         */
         let notifyAll = () => {
             notify('r', this.color.r);
             notify('g', this.color.g);
@@ -507,21 +638,42 @@ window.Colorpicker = (() => {
             notify('color', this.color.getColor());
         };
 
+        /**
+         * Sends a notifications for the given topic to all subscribers
+         *
+         * @param {string} topic
+         * @param {string} value
+         */
         let notify = (topic, value) => {
             if (subscribers[topic]) {
                 subscribers[topic](value);
             }
         };
 
+        /**
+         * Sets the color of the picker
+         *
+         * @param {string} c
+         */
         this.setColor = (c) => {
             this.color.setFromRaw(c);
             updateUI();
         };
 
+        /**
+         * Returns the color object of the picker
+         *
+         * @returns {Color}
+         */
         this.getColorObj = () => {
             return this.color;
         };
 
+        /**
+         * Returns the ui elements
+         *
+         * @returns {object}
+         */
         this.getElements = () => {
             return {
                 wrapper: wrapper,
@@ -530,6 +682,9 @@ window.Colorpicker = (() => {
             };
         };
 
+        /**
+         * Updates the position of the color picker in the document
+         */
         this.reposition = () => {
             if (wrapper.classList.contains("visible")) {
                 let rect = preview.getBoundingClientRect();
@@ -538,6 +693,9 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Closes the color picker
+         */
         this.close = () => {
             if (wrapper.classList.contains("visible")) {
                 triggerEvent("hide");
@@ -545,6 +703,12 @@ window.Colorpicker = (() => {
             }
         };
 
+        /**
+         * Binds an event of the given type to the picker object
+         *
+         * @param {string} type
+         * @param {function} func
+         */
         this.on = (type, func) => {
             if (typeof callbacks[type] === "undefined") {
                 callbacks[type] = [];
@@ -556,6 +720,8 @@ window.Colorpicker = (() => {
         /**
          * Execute constructor
          */
-        run();
+        init();
     };
+
+    return Picker;
 })();
