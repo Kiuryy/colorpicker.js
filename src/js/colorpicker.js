@@ -1,8 +1,8 @@
 /**
- * Colorpicker v1.0.0
+ * Colorpicker v1.0.1
  *
  * Philipp König
- * https://blockbyte.de/
+ * https://blockbyte.de
  */
 window.Colorpicker = (() => {
     "use strict";
@@ -240,8 +240,6 @@ window.Colorpicker = (() => {
             updateUI();
         };
 
-
-
         let setMouseTracking = (elm, callback) => {
             elm.addEventListener('mousedown', (e) => {
                 callback(e);
@@ -252,7 +250,6 @@ window.Colorpicker = (() => {
                 document.removeEventListener('mousemove', callback);
             });
         };
-
 
         let initPreview = () => {
             wrapper = document.createElement('div');
@@ -355,7 +352,6 @@ window.Colorpicker = (() => {
                 input.value = value;
             };
         };
-
 
         let updateColor = (e) => {
             let rect = this.pickingArea.getBoundingClientRect();
@@ -513,6 +509,10 @@ window.Colorpicker = (() => {
         this.setColor = (c) => {
             this.color.setFromRaw(c);
             updateUI();
+        };
+
+        this.getColorObj = () => {
+            return this.color;
         };
 
         this.getElements = () => {
