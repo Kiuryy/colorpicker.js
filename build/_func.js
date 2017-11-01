@@ -114,7 +114,7 @@
          */
         this.createFile = (src, content) => {
             return new Promise((resolve) => {
-                remove([src]).then(() => { // remove existing file
+                this.remove([src]).then(() => { // remove existing file
                     module.createFile(src, content, (err) => { // create file with given content
                         if (err) {
                             throw err;
@@ -131,7 +131,7 @@
          * @param {Array} files
          * @returns {Promise}
          */
-        let remove = (files) => {
+        this.remove = (files) => {
             return new Promise((resolve) => {
                 module.remove(files).then(() => {
                     resolve();

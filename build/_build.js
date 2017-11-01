@@ -5,6 +5,19 @@
     global.build = new function () {
 
         /**
+         * Removes the content of the dist directory
+         *
+         * @returns {Promise}
+         */
+        let clean = () => {
+            return new Promise((resolve) => {
+                func.remove([path.dist + "*"]).then(() => {
+                    resolve();
+                });
+            });
+        };
+
+        /**
          * Parses the scss files and copies the css files to the dist directory
          *
          * @returns {Promise}
@@ -52,11 +65,9 @@
          */
         this.release = () => {
             return new Promise((resolve) => {
-                Promise.all([
-                    js(),
-                    css(),
-                    img()
-                ]).then(() => {
+                clean().then(() => {
+                    return Promise.all([js(), css(), img()]);
+                }).then(() => {
                     resolve();
                 });
             });
