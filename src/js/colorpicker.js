@@ -24,11 +24,11 @@ window.Colorpicker = (() => {
         /**
          * Returns whether the given value is an numeric value or not
          *
-         * @param {mixed} value
+         * @param {int} value
          * @returns {boolean}
          */
         let isNumeric = (value) => {
-            return typeof value === 'number' && isNaN(value) === false;
+            return typeof value === "number" && isNaN(value) === false;
         };
 
         /**
@@ -41,9 +41,9 @@ window.Colorpicker = (() => {
          */
         let setRGBA = (red, green, blue, alpha) => {
             if (isNumeric(red) && isNumeric(green) && isNumeric(blue)) {
-                this.r = Math.max(0, Math.min(255, red | 0));
-                this.g = Math.max(0, Math.min(255, green | 0));
-                this.b = Math.max(0, Math.min(255, blue | 0));
+                this.r = Math.max(0, Math.min(255, Math.trunc(red)));
+                this.g = Math.max(0, Math.min(255, Math.trunc(green)));
+                this.b = Math.max(0, Math.min(255, Math.trunc(blue)));
 
                 if (isNumeric(alpha) === true) {
                     this.a = Math.max(0, Math.min(1, alpha));
@@ -80,12 +80,12 @@ window.Colorpicker = (() => {
             let valid = /(^#{0,1}[0-9A-F]{6}$)|(^#{0,1}[0-9A-F]{3}$)/i.test(value);
 
             if (valid) {
-                if (value[0] === '#') {
+                if (value[0] === "#") {
                     value = value.slice(1, value.length);
                 }
 
                 if (value.length === 3) {
-                    value = value.replace(/([0-9A-F])([0-9A-F])([0-9A-F])/i, '$1$1$2$2$3$3');
+                    value = value.replace(/([0-9A-F])([0-9A-F])([0-9A-F])/i, "$1$1$2$2$3$3");
                 }
 
                 this.r = parseInt(value.substr(0, 2), 16);
@@ -109,9 +109,9 @@ window.Colorpicker = (() => {
             let m = value - C;
             let precision = 255;
 
-            C = (C + m) * precision | 0;
-            X = (X + m) * precision | 0;
-            m = m * precision | 0;
+            C = Math.trunc((C + m) * precision);
+            X = Math.trunc((X + m) * precision);
+            m = Math.trunc(m * precision);
 
             if (H >= 0 && H < 1) {
                 setRGBA(C, X, m);
@@ -157,12 +157,12 @@ window.Colorpicker = (() => {
                 }
             }
 
-            this.hue = 60 * hue | 0;
+            this.hue = Math.trunc(60 * hue);
             if (this.hue < 0) {
                 this.hue += 360;
             }
-            this.saturation = (saturation * 100) | 0;
-            this.value = (cmax * 100) | 0;
+            this.saturation = Math.trunc(saturation * 100);
+            this.value = Math.trunc(cmax * 100);
         };
 
         /**
@@ -189,15 +189,15 @@ window.Colorpicker = (() => {
         /**
          * Sets the given rgb value to the given value
          *
-         * @param {string} name 'r', 'g', 'b' or 'a'
+         * @param {string} name "r", "g", "b" or "a"
          * @param {int|float} value
          */
         this.setByName = (name, value) => {
-            if ((name === 'r' || name === 'g' || name === 'b' || name === 'a') && isNumeric(value)) {
+            if ((name === "r" || name === "g" || name === "b" || name === "a") && isNumeric(value)) {
                 let maxLimit = 1;
 
                 if (name !== "a") {
-                    value = value | 0;
+                    value = Math.trunc(value);
                     maxLimit = 255;
                 }
 
@@ -237,45 +237,45 @@ window.Colorpicker = (() => {
         /**
          * Returns the hex string of the color
          *
-         * @returns {string} e.g. '#ffaa00'
+         * @returns {string} e.g. "#ffaa00"
          */
         this.getHex = () => {
             let r = this.r.toString(16);
             let g = this.g.toString(16);
             let b = this.b.toString(16);
             if (this.r < 16) {
-                r = '0' + r;
+                r = "0" + r;
             }
             if (this.g < 16) {
-                g = '0' + g;
+                g = "0" + g;
             }
             if (this.b < 16) {
-                b = '0' + b;
+                b = "0" + b;
             }
-            let value = '#' + r + g + b;
+            let value = "#" + r + g + b;
             return value.toLowerCase();
         };
 
         /**
          * Returns the color string
          *
-         * @returns {string} e.g. '#ffaa00' or 'rgba(255,255,255,0.5)'
+         * @returns {string} e.g. "#ffaa00" or "rgba(255,255,255,0.5)"
          */
         this.getColor = () => {
-            if (this.a | 0 === 1) { // no alpha channel -> return as hex string
+            if (Math.trunc(this.a) === 1) { // no alpha channel -> return as hex string
                 return this.getHex();
             }
 
-            let rgb = '(' + this.r + ',' + this.g + ',' + this.b;
-            let a = '';
-            let v = '';
+            let rgb = "(" + this.r + "," + this.g + "," + this.b;
+            let a = "";
+            let v = "";
             let x = parseFloat(this.a);
             if (x !== 1) {
-                a = 'a';
-                v = ',' + x;
+                a = "a";
+                v = "," + x;
             }
 
-            return 'rgb' + a + rgb + v + ')';
+            return "rgb" + a + rgb + v + ")";
         };
     }
 
@@ -316,7 +316,7 @@ window.Colorpicker = (() => {
                     let val = e.target.value;
 
                     if (c === "a") {
-                        val = +val.replace(/\,/g, ".");
+                        val = +val.replace(/,/g, ".");
                     } else {
                         val = parseInt(val);
                     }
@@ -327,7 +327,7 @@ window.Colorpicker = (() => {
                 });
             });
 
-            addInputField('color', (e) => {
+            addInputField("color", (e) => {
                 let value = e.target.value;
                 this.color.setFromRaw(value);
                 updateUI();
@@ -343,13 +343,13 @@ window.Colorpicker = (() => {
          * @param {function} callback
          */
         let addMouseListener = (elm, callback) => {
-            elm.addEventListener('mousedown', (e) => {
+            elm.addEventListener("mousedown", (e) => {
                 callback(e);
-                document.addEventListener('mousemove', callback);
+                document.addEventListener("mousemove", callback);
             });
 
-            document.addEventListener('mouseup', (e) => {
-                document.removeEventListener('mousemove', callback);
+            document.addEventListener("mouseup", () => {
+                document.removeEventListener("mousemove", callback);
             });
         };
 
@@ -357,15 +357,15 @@ window.Colorpicker = (() => {
          * Initialises the picker html and binds the general eventhandlers
          */
         let initPreview = () => {
-            wrapper = document.createElement('div');
-            wrapper.className = 'color-picker';
+            wrapper = document.createElement("div");
+            wrapper.className = "color-picker";
             document.body.appendChild(wrapper);
 
-            preview = document.createElement('span');
-            preview.className = 'color-preview';
+            preview = document.createElement("span");
+            preview.className = "color-preview";
             field.parentNode.insertBefore(preview, field.nextSibling);
 
-            preview.addEventListener('click', (e) => {
+            preview.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -379,7 +379,7 @@ window.Colorpicker = (() => {
                 updateUI();
             });
 
-            document.addEventListener('click', (e) => {
+            document.addEventListener("click", (e) => {
                 if (e.target !== wrapper && !wrapper.contains(e.target)) {
                     this.close();
                 }
@@ -390,11 +390,11 @@ window.Colorpicker = (() => {
          * Initialises the picking area
          */
         let initPickingArea = () => {
-            let area = document.createElement('div');
-            let picker = document.createElement('div');
+            let area = document.createElement("div");
+            let picker = document.createElement("div");
 
-            area.className = 'picking-area';
-            picker.className = 'picker';
+            area.className = "picking-area";
+            picker.className = "picker";
 
             this.pickingArea = area;
             this.colorPicker = picker;
@@ -415,13 +415,13 @@ window.Colorpicker = (() => {
                     pos[k] = v;
                 });
 
-                let saturation = pos[0] * 100 / size | 0;
-                let value = 100 - (pos[1] * 100 / size) | 0;
+                let saturation = Math.trunc(pos[0] * 100 / size);
+                let value = 100 - Math.trunc(pos[1] * 100 / size);
 
                 this.color.setHSV(this.color.hue, saturation, value);
 
-                this.colorPicker.style.left = pos[0] - offset + 'px';
-                this.colorPicker.style.top = pos[1] - offset + 'px';
+                this.colorPicker.style.left = pos[0] - offset + "px";
+                this.colorPicker.style.top = pos[1] - offset + "px";
 
                 updateAlphaGradient();
                 updatePreview();
@@ -436,11 +436,11 @@ window.Colorpicker = (() => {
          * Initialises the hue slider
          */
         let initHueSlider = () => {
-            let area = document.createElement('div');
-            let picker = document.createElement('div');
+            let area = document.createElement("div");
+            let picker = document.createElement("div");
 
-            area.className = 'hue';
-            picker.className = 'slider-picker';
+            area.className = "hue";
+            picker.className = "slider-picker";
 
             this.hueArea = area;
             this.huePicker = picker;
@@ -453,8 +453,8 @@ window.Colorpicker = (() => {
                     x = width;
                 }
 
-                this.huePicker.style.left = Math.max(x - 3, -2) + 'px';
-                this.color.setHue(((359 * x) / width) | 0);
+                this.huePicker.style.left = Math.max(x - 3, -2) + "px";
+                this.color.setHue(Math.trunc((359 * x) / width));
 
                 updateUI();
             });
@@ -467,13 +467,13 @@ window.Colorpicker = (() => {
          * Initialises the alpha slider
          */
         let initAlphaSlider = () => {
-            let area = document.createElement('div');
-            let mask = document.createElement('div');
-            let picker = document.createElement('div');
+            let area = document.createElement("div");
+            let mask = document.createElement("div");
+            let picker = document.createElement("div");
 
-            area.className = 'alpha';
-            mask.className = 'alpha-mask';
-            picker.className = 'slider-picker';
+            area.className = "alpha";
+            mask.className = "alpha-mask";
+            picker.className = "slider-picker";
 
             alpha = {
                 area: area,
@@ -495,7 +495,7 @@ window.Colorpicker = (() => {
 
                 this.color.setByName("a", +(x / width).toFixed(2));
 
-                alpha.picker.style.left = Math.max(x - 3, -2) + 'px';
+                alpha.picker.style.left = Math.max(x - 3, -2) + "px";
                 updatePreview();
 
                 notifyAll();
@@ -513,19 +513,19 @@ window.Colorpicker = (() => {
          * @param {function} func
          */
         let addInputField = (type, func) => {
-            let elm = document.createElement('div');
-            let input = document.createElement('input');
-            let info = document.createElement('span');
+            let elm = document.createElement("div");
+            let input = document.createElement("input");
+            let info = document.createElement("span");
 
-            elm.className = 'input-' + type;
+            elm.className = "input-" + type;
             info.textContent = type;
-            input.setAttribute('type', 'text');
+            input.setAttribute("type", "text");
 
             elm.appendChild(info);
             elm.appendChild(input);
             wrapper.appendChild(elm);
 
-            input.addEventListener('change', func);
+            input.addEventListener("change", func);
 
             subscribers[type] = (value) => {
                 input.value = value;
@@ -554,11 +554,11 @@ window.Colorpicker = (() => {
             let value = this.color.value;
             let offset = 5;
 
-            let x = (this.color.saturation * size / 100) | 0;
-            let y = size - (value * size / 100) | 0;
+            let x = Math.trunc(this.color.saturation * size / 100);
+            let y = size - Math.trunc(value * size / 100);
 
-            this.colorPicker.style.left = x - offset + 'px';
-            this.colorPicker.style.top = y - offset + 'px';
+            this.colorPicker.style.left = x - offset + "px";
+            this.colorPicker.style.top = y - offset + "px";
         };
 
         /**
@@ -567,8 +567,8 @@ window.Colorpicker = (() => {
         let updateHuePicker = () => {
             let size = this.hueArea.clientWidth;
             let offset = 1;
-            let pos = (this.color.hue * size / 360) | 0;
-            this.huePicker.style.left = pos - offset + 'px';
+            let pos = Math.trunc(this.color.hue * size / 360);
+            this.huePicker.style.left = pos - offset + "px";
         };
 
         /**
@@ -578,8 +578,8 @@ window.Colorpicker = (() => {
             if (alpha) {
                 let size = alpha.area.clientWidth;
                 let offset = 1;
-                let pos = (this.color.a * size) | 0;
-                alpha.picker.style.left = pos - offset + 'px';
+                let pos = Math.trunc(this.color.a * size);
+                alpha.picker.style.left = pos - offset + "px";
             }
         };
 
@@ -631,11 +631,11 @@ window.Colorpicker = (() => {
          * Sends all notifications to the subscribers
          */
         let notifyAll = () => {
-            notify('r', this.color.r);
-            notify('g', this.color.g);
-            notify('b', this.color.b);
-            notify('a', this.color.a);
-            notify('color', this.color.getColor());
+            notify("r", this.color.r);
+            notify("g", this.color.g);
+            notify("b", this.color.b);
+            notify("a", this.color.a);
+            notify("color", this.color.getColor());
         };
 
         /**
@@ -653,6 +653,7 @@ window.Colorpicker = (() => {
         /**
          * Sets the color of the picker
          *
+         * @public
          * @param {string} c
          */
         this.setColor = (c) => {
@@ -663,6 +664,7 @@ window.Colorpicker = (() => {
         /**
          * Returns the color object of the picker
          *
+         * @public
          * @returns {Color}
          */
         this.getColorObj = () => {
@@ -672,6 +674,7 @@ window.Colorpicker = (() => {
         /**
          * Returns the ui elements
          *
+         * @public
          * @returns {object}
          */
         this.getElements = () => {
@@ -684,6 +687,8 @@ window.Colorpicker = (() => {
 
         /**
          * Updates the position of the color picker in the document
+         *
+         * @public
          */
         this.reposition = () => {
             if (wrapper.classList.contains("visible")) {
@@ -695,6 +700,8 @@ window.Colorpicker = (() => {
 
         /**
          * Closes the color picker
+         *
+         * @public
          */
         this.close = () => {
             if (wrapper.classList.contains("visible")) {
@@ -706,6 +713,7 @@ window.Colorpicker = (() => {
         /**
          * Binds an event of the given type to the picker object
          *
+         * @public
          * @param {string} type
          * @param {function} func
          */
@@ -721,7 +729,7 @@ window.Colorpicker = (() => {
          * Execute constructor
          */
         init();
-    };
+    }
 
     return Picker;
 })();

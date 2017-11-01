@@ -1,16 +1,17 @@
 (() => {
     "use strict";
 
+    /* global path */
     global.func = new function () {
 
         let module = {
-            find: require('glob-concat'),
-            read: require('read-file'),
-            remove: require('del'),
-            createFile: require('create-file'),
-            uglifyjs: require('uglify-es'),
-            sass: require('node-sass'),
-            copy: require('cp-file')
+            find: require("glob-concat"),
+            read: require("read-file"),
+            remove: require("del"),
+            createFile: require("create-file"),
+            uglifyjs: require("uglify-es"),
+            sass: require("node-sass"),
+            copy: require("cp-file")
         };
 
         /*
@@ -45,7 +46,7 @@
          */
         let readFile = (src) => {
             return new Promise((resolve) => {
-                module.read(src, {encoding: 'utf8'}, (err, content) => {
+                module.read(src, {encoding: "utf8"}, (err, content) => {
                     if (err) {
                         throw err;
                     }
@@ -134,7 +135,7 @@
             return new Promise((resolve) => {
                 module.remove(files).then(() => {
                     resolve();
-                })
+                });
             });
         };
 
@@ -181,10 +182,10 @@
                             case "js": {
                                 let result = module.uglifyjs.minify(content, {
                                     output: {
-                                        preamble: '/*! (c) ' + process.env.npm_package_author_name + ' under ' + process.env.npm_package_license + ' */'
+                                        preamble: "/*! " + process.env.npm_package_name + " v" + process.env.npm_package_version + " | (c) " + process.env.npm_package_author_name + " under " + process.env.npm_package_license + " | " + process.env.npm_package_homepage + " */"
                                     },
                                     mangle: {
-                                        reserved: ['jsu', 'chrome']
+                                        reserved: ["jsu", "chrome"]
                                     }
                                 });
                                 if (result.error) {

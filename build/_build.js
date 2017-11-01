@@ -1,6 +1,7 @@
 (() => {
     "use strict";
 
+    /* global func, path */
     global.build = new function () {
 
         /**
@@ -11,7 +12,7 @@
         let css = () => {
             return new Promise((resolve) => {
                 func.minify([ // parse scss files
-                    path.src + 'scss/*.scss'
+                    path.src + "scss/*.scss"
                 ], path.dist + "css/").then(() => {
                     resolve();
                 });
@@ -39,7 +40,7 @@
         let js = () => {
             return new Promise((resolve) => {
                 func.minify([
-                    path.src + 'js/*.js'
+                    path.src + "js/*.js"
                 ], path.dist + "js/").then(() => {
                     resolve();
                 });
@@ -55,9 +56,7 @@
                     js(),
                     css(),
                     img()
-                ]).catch(reason => {
-                    throw reason;
-                }).then(() => {
+                ]).then(() => {
                     resolve();
                 });
             });
