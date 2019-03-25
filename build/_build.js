@@ -9,7 +9,7 @@
          *
          * @returns {Promise}
          */
-        let clean = () => {
+        const clean = () => {
             return new Promise((resolve) => {
                 func.remove([path.dist + "*"]).then(() => {
                     resolve();
@@ -22,7 +22,7 @@
          *
          * @returns {Promise}
          */
-        let css = () => {
+        const css = () => {
             return new Promise((resolve) => {
                 func.minify([ // parse scss files
                     path.src + "scss/*.scss"
@@ -37,7 +37,7 @@
          *
          * @returns {Promise}
          */
-        let img = () => {
+        const img = () => {
             return new Promise((resolve) => {
                 func.copy([path.src + "img/**/*"], [path.src + "**/*.xcf"], path.dist, false).then(() => {
                     resolve();
@@ -50,7 +50,7 @@
          *
          * @returns {Promise}
          */
-        let js = () => {
+        const js = () => {
             return new Promise((resolve) => {
                 func.minify([
                     path.src + "js/*.js"
