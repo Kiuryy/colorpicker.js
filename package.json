@@ -1,6 +1,6 @@
 {
   "name": "colorpicker.js",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "license": "Apache-2.0",
   "author": "Philipp König",
   "homepage": "https://blockbyte.de",
@@ -17,16 +17,16 @@
     "concat": "^1.0.3",
     "create-file": "^1.0.1",
     "del": "^7.0.0",
-    "eslint": "^8.30.0",
-    "fs-extra": "^11.1.0",
+    "eslint": "^8.45.0",
+    "fs-extra": "^11.1.1",
     "glob-concat": "^1.0.3",
     "html-minifier": "^4.0.0",
     "jsonminify": "^0.4.2",
-    "node-sass": "^8.0.0",
-    "npm-check-updates": "^16.6.0",
+    "sass": "^1.64.1",
+    "npm-check-updates": "^16.10.16",
     "read-file": "^0.2.0",
-    "request": "^2.88.0",
-    "terser": "^5.16.1",
+    "request": "^2.88.2",
+    "terser": "^5.19.2",
     "zip-dir": "^2.0.0"
   }
 }
